@@ -20,10 +20,9 @@ jobs:
         run: |
           docker build -t challenge-latam .  # Builds the Docker image with the tag "challenge-latam"
 
-      - name: Push Docker image to GCP Container Registry
+      - name: Tag and Push Docker image to GCP Container Registry
         run: |
-          # Tag the image and push to Google Container Registry
-          docker tag challenge-latam gcr.io/${{ secrets.GCP_PROJECT }}/challenge-latam:latest
+          docker tag challenge-latam gcr.io/${{ secrets.GCP_PROJECT }}/challenge-latam:latest  # Tag the image
           docker push gcr.io/${{ secrets.GCP_PROJECT }}/challenge-latam:latest  # Push the image to GCP Container Registry
 
       - name: Deploy to GCP (Cloud Run)
