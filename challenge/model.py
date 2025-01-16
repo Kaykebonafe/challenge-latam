@@ -30,6 +30,16 @@ class DelayModel:
     ):
         self._model = LogisticRegression() # Model should be saved in this attribute.
 
+    def create_target_column(self, data: pd.DataFrame) -> pd.DataFrame:
+        data['Fecha-O'] = pd.to_datetime(data['Fecha-O'], format='%Y-%m-%d %H:%M:%S')
+        data['Fecha-I'] = pd.to_datetime(data['Fecha-I'], format='%Y-%m-%d %H:%M:%S')
+
+        data['min_diff'] = (data['Fecha-O'] - data['Fecha-I']).dt.total_seconds() / 60
+
+        threshold_in_minutes = 15
+
+        return np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
+
     def preprocess(
         self,
         data: pd.DataFrame,
@@ -47,15 +57,8 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        data['Fecha-O'] = pd.to_datetime(data['Fecha-O'], format='%Y-%m-%d %H:%M:%S')
-        data['Fecha-I'] = pd.to_datetime(data['Fecha-I'], format='%Y-%m-%d %H:%M:%S')
-
-        data['min_diff'] = (data['Fecha-O'] - data['Fecha-I']).dt.total_seconds() / 60
-
-        threshold_in_minutes = 15
-        data['delay'] = np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
-
         if target_column:
+            data[target_column] = self.create_target_column(data=data)
             target = pd.DataFrame(data[target_column])
 
         features = pd.concat(
@@ -66,6 +69,9 @@ class DelayModel:
             ],
             axis = 1
         )
+        for feature in self.get_feature_cols:
+                if feature not in features.columns:
+                    features[feature] = False
 
         features = features[self.get_feature_cols]
 
