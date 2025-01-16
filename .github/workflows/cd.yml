@@ -36,9 +36,9 @@ jobs:
 
       - name: Deploy to GCP (Cloud Run)
         run: |
-          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}  # Set the project in gcloud
-          gcloud run deploy challenge-latam \  # Deploy using your service name
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud run deploy challenge-latam \
             --image=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/challenge-latam/challenge-latam:latest \
             --platform managed \
             --region us-central1 \
-            --allow-unauthenticated  # Modify based on your deployment preferences
+            --allow-unauthenticated
