@@ -3,7 +3,7 @@ name: "Continuous Delivery"
 on:
   push:
     branches:
-      - main
+      - main # Trigger on push to the main branch (deployment should happen on push to main)
 
 jobs:
   deploy:
@@ -11,30 +11,27 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2 # Checks out the repository
 
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v2 # Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2 # Set up Docker Buildx for multi-platform builds
 
       - name: Build Docker image
         run: |
-          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-python-app:$GITHUB_SHA .  # Build and tag the image with the commit hash
+          docker build -t challenge-latam .  # Builds the Docker image with the tag "challenge-latam"
 
-      - name: Set up Google Cloud credentials
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }} # Add your service account key to secrets
-          project_id: ${{ secrets.GCP_PROJECT_ID }} # Add your GCP project ID to secrets
-
-      - name: Push Docker image to Google Container Registry
+      - name: Push Docker image to GCP Container Registry
         run: |
-          gcloud auth configure-docker
-          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-python-app:$GITHUB_SHA  # Push the Docker image to GCP Container Registry
+          # Tag the image and push to Google Container Registry
+          docker tag challenge-latam gcr.io/${{ secrets.GCP_PROJECT }}/challenge-latam:latest
+          docker push gcr.io/${{ secrets.GCP_PROJECT }}/challenge-latam:latest  # Push the image to GCP Container Registry
 
-      - name: Deploy to Google Cloud Run
+      - name: Deploy to GCP (Cloud Run)
         run: |
-          gcloud run deploy my-python-app \
-            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-python-app:$GITHUB_SHA \
+          gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY }}
+          gcloud config set project ${{ secrets.GCP_PROJECT }}
+          gcloud run deploy challenge-latam \  # Deploy using your service name
+            --image=gcr.io/${{ secrets.GCP_PROJECT }}/challenge-latam:latest \
             --platform managed \
             --region us-central1 \
-            --allow-unauthenticated  # Adjust region and permissions based on your setup
+            --allow-unauthenticated  # Modify based on your deployment preferences

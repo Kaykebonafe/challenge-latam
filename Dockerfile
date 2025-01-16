@@ -17,8 +17,7 @@ RUN apt-get update && apt-get install -y \
 # Copy the application code
 COPY . /app/
 
-# Install the required Python packages
-RUN pip install --no-cache-dir -r requirements.txt
+RUN make install
 
 # Expose the port that your FastAPI app will run on
 EXPOSE 8000
