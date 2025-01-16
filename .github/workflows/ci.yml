@@ -1,0 +1,32 @@
+name: "Continuous Integration"
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to main branch
+  pull_request:
+    branches:
+      - main # Trigger on pull requests to main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2 # Set up Docker Buildx for multi-platform builds
+
+      - name: Build Docker image
+        run: |
+          docker build -t my-python-app .  # Build the Docker image using your Dockerfile
+
+      - name: Run tests inside Docker container
+        run: |
+          docker run --rm my-python-app pytest  # Run tests using pytest inside the container
+
+      - name: Lint code inside Docker container
+        run: |
+          docker run --rm my-python-app flake8 .  # Run flake8 for linting inside the container
