@@ -8,7 +8,7 @@ from challenge.model import DelayModel
 class TestModel(unittest.TestCase):
 
     FEATURES_COLS = [
-        "OPERA_Latin American Wings", 
+        "OPERA_Latin American Wings",
         "MES_7",
         "MES_10",
         "OPERA_Grupo LATAM",
@@ -28,8 +28,8 @@ class TestModel(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.model = DelayModel()
-        self.data = pd.read_csv(filepath_or_buffer="../data/data.csv")
-        
+        self.data = pd.read_csv(filepath_or_buffer="data/data.csv")
+
 
     def test_model_preprocess_for_training(
         self
@@ -80,7 +80,7 @@ class TestModel(unittest.TestCase):
         )
 
         report = classification_report(target_validation, predicted_target, output_dict=True)
-        
+
         assert report["0"]["recall"] < 0.60
         assert report["0"]["f1-score"] < 0.70
         assert report["1"]["recall"] > 0.60
