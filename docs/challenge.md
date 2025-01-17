@@ -4,7 +4,23 @@ In this MD I'll explain my choices and paths that I've went through to
 solve this challenge.
 
 It's important to cite in this part of the docs that the endpoint of the
-deployed application is: https://challenge-latam-914044025861.us-central1.run.app
+deployed application is:
+
+It is important to cite that the json_schema to make requests for the api
+is in the same way that were provided during this challenge.
+
+Being:
+```json
+{
+    "flights": [
+        {
+            "OPERA": "Aerolineas Argentinas",
+            "TIPOVUELO": "N",
+            "MES": 13
+        }
+    ]
+}
+```
 
 ## Explanation on model selection
 
