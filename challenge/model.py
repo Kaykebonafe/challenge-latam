@@ -1,9 +1,8 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from typing import Tuple, Union, List
 from joblib import dump, load
-from datetime import datetime
+from typing import Tuple, Union, List
 from sklearn.linear_model import LogisticRegression
 
 
@@ -28,13 +27,21 @@ class DelayModel:
     def __init__(
         self
     ):
-        self._model = LogisticRegression() # Model should be saved in this attribute.
+        self._model = LogisticRegression()
 
     def create_target_column(self, data: pd.DataFrame) -> pd.DataFrame:
-        data['Fecha-O'] = pd.to_datetime(data['Fecha-O'], format='%Y-%m-%d %H:%M:%S')
-        data['Fecha-I'] = pd.to_datetime(data['Fecha-I'], format='%Y-%m-%d %H:%M:%S')
+        data['Fecha-O'] = pd.to_datetime(
+            data['Fecha-O'],
+            format='%Y-%m-%d %H:%M:%S'
+        )
+        data['Fecha-I'] = pd.to_datetime(
+            data['Fecha-I'],
+            format='%Y-%m-%d %H:%M:%S'
+        )
 
-        data['min_diff'] = (data['Fecha-O'] - data['Fecha-I']).dt.total_seconds() / 60
+        data['min_diff'] = (
+            data['Fecha-O'] - data['Fecha-I']
+        ).dt.total_seconds() / 60
 
         threshold_in_minutes = 15
 
@@ -63,15 +70,15 @@ class DelayModel:
 
         features = pd.concat(
             [
-                pd.get_dummies(data['OPERA'], prefix = 'OPERA'),
-                pd.get_dummies(data['TIPOVUELO'], prefix = 'TIPOVUELO'),
-                pd.get_dummies(data['MES'], prefix = 'MES')
+                pd.get_dummies(data['OPERA'], prefix='OPERA'),
+                pd.get_dummies(data['TIPOVUELO'], prefix='TIPOVUELO'),
+                pd.get_dummies(data['MES'], prefix='MES')
             ],
-            axis = 1
+            axis=1
         )
         for feature in self.get_feature_cols:
-                if feature not in features.columns:
-                    features[feature] = False
+            if feature not in features.columns:
+                features[feature] = False
 
         features = features[self.get_feature_cols]
 
@@ -102,7 +109,6 @@ class DelayModel:
         self._model.fit(features, target)
 
         dump(self._model, "flight_delay_logreg_model.joblib")
-
 
     def predict(
         self,
